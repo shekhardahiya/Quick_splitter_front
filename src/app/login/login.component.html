@@ -1,0 +1,76 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-4 offset-md-4 col-sm-12">
+      <div class="card border-primary">
+        <div class="card-header text-center"><h3>Login Here</h3></div>
+        <div class="card-body">
+          <form [formGroup]="userLoginForm">
+            <div class="mb-3">
+              <label for="userEmailId" class="form-label">Email Id</label>
+              <input
+                type="email"
+                class="form-control"
+                id="userEmailId"
+                aria-describedby="userEmailId"
+                formControlName="userEmailId"
+              />
+              <span
+                class="text-danger"
+                *ngIf="form.userEmailId.errors && form.userEmailId.touched"
+                >Email must be a valid email address</span
+              >
+              <div id="userEmailId" class="form-text">
+                We'll never share your email with anyone else.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                formControlName="password"
+              />
+              <span
+                class="text-danger"
+                *ngIf="form.password.errors && form.password.touched"
+                >Passsword is required</span
+              >
+            </div>
+          </form>
+        </div>
+        <div *ngIf="wrongPassword">
+          <h5 class="text-danger text-center">Password is wrong, try again</h5>
+        </div>
+        <div class="card-footer">
+          <button
+            type="submit"
+            class="btn btn-primary d-grid gap-2 col-12"
+            (click)="checkUser()"
+            [disabled]="!userLoginForm.valid"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="userNotFound" class="text-success">
+        <div class="card">
+          <div class="body">
+            <div class="text-center">
+              <h4>User Not Found, Register Now</h4>
+            </div>
+            <div>
+              <button
+                class="btn btn-primary col-8 offset-2"
+                [routerLink]="['/register']"
+              >
+                Register
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

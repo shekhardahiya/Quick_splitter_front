@@ -1,0 +1,20 @@
+.navColor{
+    background-color: #102d59f1;
+  }
+
+  .fa-youtube{
+    color: red;
+  }
+  .call{
+    text-decoration: none;
+  }
+  .footers{
+    /* position: fixed; */
+    left: 0;
+    bottom: 0;
+
+  }
+  g{
+    cursor: pointer;
+}
+  

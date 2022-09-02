@@ -1,0 +1,48 @@
+/* Chrome, Safari, Edge, Opera */
+/* input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+} */
+
+/* Firefox */
+/* input[type=number] {
+  -moz-appearance: textfield;
+} */
+
+.headingsTable{
+    font-family: 'Verdana',sans-serif;
+        font-weight: bold;
+  }
+
+  a{
+    text-decoration: none;
+  }
+  .userCreatedTransaction{
+    color: red !important
+  }
+  .otherCreatedransaction{
+    color: green !important
+  }
+  .greenPlus{
+    color: green;
+  }
+  .redMinus{
+    color: red;
+  }
+  .fa-money-check-dollar{
+    color: green;
+  }
+  .yourExpenseheading{
+    font-family: Georgia, 'Times New Roman', Times, serif
+
+  }
+  .allExpensesHeading{
+    
+    font-family: Georgia, 'Times New Roman', Times, serif
+
+  }
+  #defaultMemberMessage{
+    margin-top: 0;
+    margin-bottom: 5px;
+  }
