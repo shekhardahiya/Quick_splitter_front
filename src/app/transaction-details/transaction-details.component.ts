@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { DataProviderService } from '../data-provider.service';
 
 @Component({
@@ -16,8 +15,6 @@ export class TransactionDetailsComponent implements OnInit {
   commentInput;
   constructor(
     private api: DataProviderService,
-    private formBuilder: FormBuilder,
-    private router: Router,
     private route: ActivatedRoute
   ) {}
 
@@ -25,30 +22,30 @@ export class TransactionDetailsComponent implements OnInit {
     this.route.params.subscribe((params) => {
       this.transactionId = params['transactionId'];
     });
-
-    console.log(this.transactionId);
     this.loggedInUser = JSON.parse(localStorage.getItem('user'));
 
-    this.loggedInUser = JSON.parse(localStorage.getItem('user'));
     this.fetchTransactionDetails();
     this.fetchAllComments();
   }
-
+  /**
+   * This method fecthes all details of a transaction.
+   */
   fetchTransactionDetails() {
     this.api.getSingleTransactions(this.transactionId).subscribe((data) => {
-      console.log(data);
-
       this.transactionDetails = data['data'][0];
-      console.log(this.transactionDetails);
     });
   }
-
+  /**
+   * This method will fetch all comments of a transaction
+   */
   fetchAllComments() {
     this.api.getAllComments(this.transactionId).subscribe((data) => {
-      console.log(data);
       this.allComments = data['data'].reverse();
     });
   }
+  /**
+   * This method will create a new Comment for a transaction
+   */
   createComment() {
     const comment = {
       transactionId: this.transactionId,
@@ -58,13 +55,17 @@ export class TransactionDetailsComponent implements OnInit {
         userEmailId: this.loggedInUser.userEmailId,
       },
     };
+    this.commentInput = '';
     this.api.createComment(comment).subscribe((data) => {
-      console.log(data);
       setTimeout(() => {
         this.fetchAllComments();
       }, 1000);
     });
   }
+  /**
+   * This method will update a existing transaction
+   * @param memberId
+   */
   updateTransaction(memberId) {
     let members = this.transactionDetails.membersOfTransaction;
 
@@ -73,15 +74,12 @@ export class TransactionDetailsComponent implements OnInit {
         member.paid = true;
       }
     });
-    console.log(members);
     const payloadForTransactionUpdate = {
       transactionId: this.transactionId,
       membersOfTransaction: members,
     };
     this.api
       .updateTransaction(payloadForTransactionUpdate)
-      .subscribe((data) => {
-        console.log(data);
-      });
+      .subscribe((data) => {});
   }
 }

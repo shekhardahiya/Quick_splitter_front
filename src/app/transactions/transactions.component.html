@@ -1,39 +1,94 @@
 <br />
 <div class="container">
   <div class="row">
-    <div class="col-md-4 col-sm-12 table-responsive">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 text-center vl">
+            <h5>Important Links</h5>
+          </div>
+
+          <div class="col-md-3 text-center vl">
+            <a class="impLinks" (click)="focusOnTransactionName()"
+              >Add an Expense</a
+            >
+          </div>
+
+          <div class="col-md-3 text-center vl">
+            <a class="impLinks" (click)="scroll(allExpense)">
+              All Expenses of this Group
+            </a>
+          </div>
+
+          <div class="col-md-3 text-center vl">
+            <a class="impLinks" groupMembers (click)="scroll(groupMembers)">
+              Group Members</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-7 col-sm-12 table-responsive">
       <h4 class="yourExpenseheading">Your Expenses</h4>
+      <hr />
       <p *ngIf="userPartOfTransactions?.length == 0">No Expenses, Create Now</p>
       <table
         *ngIf="userPartOfTransactions?.length > 0"
-        class="table table-bordered table-hover table-striped"
+        class="table table-bordered table-hover table-striped tableTop"
       >
-        <thead class="">
+        <thead class="tableHeadColor">
           <tr>
             <th class="headingsTable">Expense</th>
             <th class="headingsTable">Amount</th>
+            <th class="headingsTable">Settlement</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="table-group-divider">
           <tr *ngFor="let t of userPartOfTransactions">
-            <td>
-              <a
-                class="text-capitalize"
+            <td class="tableSpace">
+              <p
+                class="text-capitalize fs-5"
                 [ngClass]="{
                   ' userCreatedTransaction':
                     t.initiatedBy.userEmailId == loggedInUser.userEmailId,
                   otherCreatedransaction:
                     t.initiatedBy.userEmailId != loggedInUser.userEmailId
                 }"
-                href=""
+              >
+                {{ t.transactionName }}
+              </p>
+              <div class="form-text">
+                Created by:
+                <span
+                  *ngIf="t.initiatedBy.userEmailId == loggedInUser.userEmailId"
+                  >You</span
+                ><span
+                  *ngIf="t.initiatedBy.userEmailId != loggedInUser.userEmailId"
+                >
+                  {{ t.initiatedBy.memberName }}</span
+                >
+              </div>
+            </td>
+
+            <td>{{ t.amount | currency: "INR":"symbol":"1.0-0" }}</td>
+            <td>
+              <button
                 data-bs-toggle="modal"
                 data-bs-target="#exampleModal"
                 (click)="assigntransactionToModal(t)"
+                class="btn btn-outline-primary"
               >
-                {{ t.transactionName }}
-              </a>
+                Check
+              </button>
             </td>
-            <td>{{ t.amount | currency: "INR":"symbol":"1.0-0" }}</td>
+            <!-- <td>
+              <p *ngIf="t.initiatedBy.userEmailId == loggedInUser.userEmailId">
+                You
+              </p>
+              <p *ngIf="t.initiatedBy.userEmailId != loggedInUser.userEmailId">
+                {{ t.initiatedBy.userName }}
+              </p>
+            </td> -->
           </tr>
           <tr>
             <!-- <td class="headingsTable">Total</td> -->
@@ -47,8 +102,11 @@
         </tbody>
       </table>
     </div>
+    <br />
 
-    <div class="col-md-4 col-sm-12">
+    <div class="col-md-5 col-sm-12">
+      <br /><br />
+
       <div class="card">
         <div class="card-header text-center fs-4 allExpensesHeading">
           Add an Expense <i class="fa-solid fa-money-check-dollar fa-lg"></i>
@@ -158,141 +216,232 @@
           >
             Add
           </button>
+
+          <svg
+            *ngIf="showSuccess"
+            class="checkmark"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 52 52"
+          >
+            <circle
+              class="checkmark__circle"
+              cx="26"
+              cy="26"
+              r="25"
+              fill="none"
+            />
+            <path
+              class="checkmark__check"
+              fill="none"
+              d="M14.1 27.2l7.1 7.2 16.7-16.8"
+            />
+          </svg>
         </div>
       </div>
     </div>
-    <div class="col-md-4 table-responsive">
-      <h4 class="allExpensesHeading">All Expenses for this Group</h4>
-      <p *ngIf="allTransactions?.length == 0">No Expenses, Create Now</p>
-      <table
-        *ngIf="allTransactions?.length > 0"
-        class="table table-bordered table-hover table-striped"
-      >
-        <thead class="">
-          <tr>
-            <th class="headingsTable">Expense</th>
-            <th class="headingsTable">Amount</th>
-          </tr>
-        </thead>
+    <br />
+  </div>
+  <hr />
+  <div class="row">
+    <div class="col-md-6">
+      <div class="table-responsive">
+        <h4 class="allExpensesHeading" #allExpense>
+          All Expenses for this Group
+        </h4>
+        <br />
+        <p *ngIf="allTransactions?.length == 0">No Expenses, Create Now</p>
+        <table
+          *ngIf="allTransactions?.length > 0"
+          class="table table-bordered table-hover table-striped"
+        >
+          <thead class="tableHeadColor">
+            <tr>
+              <th class="headingsTable fs-5">Expense</th>
+              <th class="headingsTable fs-5">Amount</th>
+            </tr>
+          </thead>
+          <tbody class="table-group-divider">
+            <tr *ngFor="let t of allTransactions">
+              <td>
+                <p class="text-primary text-capitalize fs-5">
+                  {{ t.transactionName }}
+                </p>
+              </td>
+              <td>{{ t.amount | currency: "INR":"symbol":"1.0-0" }}</td>
+            </tr>
+            <tr>
+              <td class="headingsTable">Total</td>
+              <td>
+                {{
+                  totalOfAllTransactions?.amount
+                    | currency: "INR":"symbol":"1.0-0"
+                }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-md-4 offset-md-2">
+      <h4 class="allExpensesHeading text-center" #groupMembers>
+        Group Members
+      </h4>
+      <table class="table table-bordered table-hover tableTop">
         <tbody>
-          <tr *ngFor="let t of allTransactions">
+          <tr *ngFor="let member of groupMember">
+            <td class="text-capitalize">{{ member?.memberName }}</td>
             <td>
-              <p class="text-primary text-capitalize">
-                {{ t.transactionName }}
-              </p>
-            </td>
-            <td>{{ t.amount | currency: "INR":"symbol":"1.0-0" }}</td>
-          </tr>
-          <tr>
-            <td class="headingsTable">Total</td>
-            <td>
-              {{
-                totalOfAllTransactions?.amount
-                  | currency: "INR":"symbol":"1.0-0"
-              }}
+              <button
+                *ngIf="loggedInUser.userEmailId != member.userEmailId"
+                class="btn btn-success"
+                (click)="sendInviteMail(member)"
+                [disabled]=""
+              >
+                Invite
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
+      <div
+        *ngIf="inviteSend"
+        class="alert alert-success fs-5 text-center"
+        role="alert"
+      >
+        Invite Sent to the Member
+      </div>
+      <div
+        *ngIf="registered"
+        class="alert alert-danger fs-5 text-center"
+        role="alert"
+      >
+        User already Registered
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Modal -->
-<div
-  class="modal fade"
-  id="exampleModal"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <div>
-          <div
-            *ngIf="
-              transactionInModal?.initiatedBy.userEmailId ==
-              loggedInUser?.userEmailId
-            "
-          >
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="exampleModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-capitalize" id="exampleModalLabel">
+            {{ transactionInModal?.transactionName }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div>
+            <div
+              *ngIf="
+                transactionInModal?.initiatedBy.userEmailId ==
+                loggedInUser?.userEmailId
+              "
+            >
+              <div
+                *ngFor="let member of transactionInModal?.membersOfTransaction"
+              >
+                <p
+                  *ngIf="member?.userEmailId != loggedInUser?.userEmailId"
+                  class="fs-5"
+                >
+                  <i class="fa-solid fa-plus greenPlus"></i>
+                  <span class="text-capitalize"> {{ member?.memberName }}</span>
+
+                  <span *ngIf="!member?.paid"> will pay you</span>
+                  <span *ngIf="member?.paid"> paid you</span>
+                  {{
+                    transactionInModal?.amount /
+                      transactionInModal?.membersOfTransaction.length
+                      | currency: "INR":"symbol"
+                  }}
+                </p>
+              </div>
+            </div>
+
+            <br />
             <div
               *ngFor="let member of transactionInModal?.membersOfTransaction"
             >
-              <p *ngIf="member?.userEmailId != loggedInUser?.userEmailId">
-                <i class="fa-solid fa-plus greenPlus"></i>
-                <span class="text-capitalize"> {{ member?.memberName }}</span>
+              <div
+                *ngIf="
+                  transactionInModal?.initiatedBy.userEmailId !=
+                    loggedInUser?.userEmailId &&
+                  member?.userEmailId == loggedInUser?.userEmailId
+                "
+              >
+                <i class="fa-solid fa-minus redMinus"></i>
+                <span class="fs-5">You</span>
+                <span class="fs-5" *ngIf="!member?.paid"> have to pay</span>
+                <span class="fs-5" *ngIf="member?.paid"> paid </span>
 
-                <span *ngIf="!member?.paid"> will pay you</span>
-                <span *ngIf="member?.paid"> paid you</span>
-                {{
-                  transactionInModal?.amount /
-                    transactionInModal?.membersOfTransaction.length
-                    | currency: "INR":"symbol"
-                }}
-              </p>
+                <span class="fs-5">
+                  {{
+                    transactionInModal?.amount /
+                      transactionInModal?.membersOfTransaction.length
+                      | currency: "INR":"symbol"
+                  }}
+                  to
+                </span>
+                <span class="text-capitalize fs-5">
+                  {{ transactionInModal?.initiatedBy.memberName }}</span
+                >
+                &nbsp;
+                <span *ngIf="member?.paid" class="badge text-bg-success">
+                  Settled</span
+                >
+              </div>
             </div>
-          </div>
-          <br />
-          <div *ngFor="let member of transactionInModal?.membersOfTransaction">
-            <div
+            <br />
+
+            Created By:
+            <span class="text-capitalize">{{
+              transactionInModal?.initiatedBy.memberName
+            }}</span>
+            <span
               *ngIf="
-                transactionInModal?.initiatedBy.userEmailId !=
-                  loggedInUser?.userEmailId &&
-                member?.userEmailId == loggedInUser?.userEmailId
+                transactionInModal?.initiatedBy.userEmailId ==
+                loggedInUser?.userEmailId
               "
             >
-              <i class="fa-solid fa-minus redMinus"></i>
-              You
-              <span *ngIf="!member?.paid"> have to pay</span>
-              <span *ngIf="member?.paid"> paid </span>
-
-              {{
-                transactionInModal?.amount /
-                  transactionInModal?.membersOfTransaction.length
-                  | currency: "INR":"symbol"
-              }}
-              to
-              <span class="text-capitalize">
-                {{ transactionInModal?.initiatedBy.memberName }}</span
-              >
-            </div>
+              (You)</span
+            >
+            &nbsp;
+            <span *ngIf="transactionSettled" class="badge text-bg-success"
+              >Settled</span
+            >
           </div>
           <br />
-
-          Created By:
-          <span class="text-capitalize">{{
-            transactionInModal?.initiatedBy.memberName
-          }}</span>
-        </div>
-        <br />
-        <button
-          class="btn btn-primary col-8 offset-2"
-          [routerLink]="[
-            '/transactions-details',
-            transactionInModal?.transactionId
-          ]"
-          data-bs-dismiss="modal"
-        >
-          More Details
-        </button>
-        <div class="modal-footer">
           <button
-            type="button"
-            class="btn btn-secondary"
+            class="btn btn-primary col-8 offset-2"
+            [routerLink]="[
+              '/transactions-details',
+              transactionInModal?.transactionId
+            ]"
             data-bs-dismiss="modal"
           >
-            Close
+            More Details
           </button>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ export class RegisterComponent implements OnInit {
   userData;
   userRegisterForm!: FormGroup;
   successMessage = false;
+  userExist = false;
   constructor(
     private api: DataProviderService,
     private formBuilder: FormBuilder,
@@ -21,6 +22,9 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
     this.initiateRegisterForm();
   }
+  /**
+   * This method will initiate the register form for the new users
+   */
   initiateRegisterForm() {
     this.userRegisterForm = this.formBuilder.group({
       userEmailId: [
@@ -30,23 +34,27 @@ export class RegisterComponent implements OnInit {
           Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$'),
         ],
       ],
-      password: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(8)]],
       userName: ['', Validators.required],
     });
   }
   get form() {
     return this.userRegisterForm.controls;
   }
-
+  /**
+   * This method adds the new User
+   */
   addNewuser() {
+    this.userExist = false;
     this.api.newUSer(this.userRegisterForm.value).subscribe(
       (data) => {
-        console.log(data);
         this.successMessage = true;
         this.userRegisterForm.reset();
       },
       (error) => {
-        console.log(error);
+        if (error.error == 'User Already exist, Please Login') {
+          this.userExist = true;
+        }
       }
     );
   }

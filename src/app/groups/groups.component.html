@@ -32,6 +32,21 @@
         Visit your Groups <i class="fa-solid fa-people-group groupIcon"></i>
       </h5>
       <hr />
+      <div *ngIf="partOfGroups?.length == 0">
+        <p class="fs-5">
+          You are not part of any group currently. Create a group, and start
+          Splitting
+        </p>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+        >
+          Create Group
+        </button>
+      </div>
       <div *ngFor="let group of partOfGroups" class="col-12">
         <a class="groupName" [routerLink]="['/transactions', group.groupId]">
           <div class="card cardgroup">
@@ -141,16 +156,20 @@
         <button
           type="submit"
           class="btn btn-primary col-12"
-          (click)="allData()"
+          (click)="createGroup()"
           [disabled]="!createGroupForm.valid"
         >
           Create Group
         </button>
       </div>
       <div>
-        <p *ngIf="groupCreated" class="text-success">
+        <div
+          *ngIf="groupCreated"
+          class="alert alert-success fs-5 text-center"
+          role="alert"
+        >
           Group Created Successfully
-        </p>
+        </div>
       </div>
       <div class="modal-footer">
         <button

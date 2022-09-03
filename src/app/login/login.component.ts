@@ -22,7 +22,9 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.initiateLoginForm();
   }
-
+/**
+ * This method will initiate the Login Form 
+ */
   initiateLoginForm() {
     this.userLoginForm = this.formBuilder.group({
       userEmailId: [
@@ -38,6 +40,9 @@ export class LoginComponent implements OnInit {
   get form() {
     return this.userLoginForm.controls;
   }
+  /**
+   * This method verifies the user credentials
+   */
   checkUser() {
     this.wrongPassword = false;
     this.userNotFound = false;
@@ -53,12 +58,12 @@ export class LoginComponent implements OnInit {
               groupsInvolved: this.userData?.groupsInvolved,
             })
           );
+          this.api.sendUserData(this.userData?.userName);
           this.router.navigate(['groups']);
         } else {
         }
       },
       (error) => {
-        console.log(error);
         if (error.error['error'] == 'Invalid password') {
           this.wrongPassword = true;
         } else {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -7,7 +7,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { DataProviderService } from '../data-provider.service';
 
 @Component({
@@ -16,6 +16,7 @@ import { DataProviderService } from '../data-provider.service';
   styleUrls: ['./transactions.component.css'],
 })
 export class TransactionsComponent implements OnInit {
+  @ViewChild('tname') transactionNameField;
   transactionForm: FormGroup;
   groupId;
   start = false;
@@ -27,10 +28,13 @@ export class TransactionsComponent implements OnInit {
   transactionInModal;
   loggedInUser;
   groupMemberForCheckbox;
+  showSuccess = false;
+  inviteSend = false;
+  registered = false;
+  transactionSettled = false;
   constructor(
     private api: DataProviderService,
     private formBuilder: FormBuilder,
-    private router: Router,
     private route: ActivatedRoute
   ) {}
 
@@ -45,7 +49,9 @@ export class TransactionsComponent implements OnInit {
     this.getAllTransactions();
     // this.partOfTransactions();
   }
-
+  /**
+   * This method will initiate the transaction form
+   */
   initiateTransactionForm() {
     this.transactionForm = this.formBuilder.group({
       transactionName: ['', [Validators.required]],
@@ -57,7 +63,9 @@ export class TransactionsComponent implements OnInit {
   get membersOfTransactionFormArray() {
     return this.transactionForm.controls.membersOfTransaction as FormArray;
   }
-
+  /**
+   * This method will fetch all transactions based on the group Id
+   */
   getAllTransactions() {
     this.api.getAlltransactions(this.groupId).subscribe((data) => {
       this.allTransactions = data['data'].reverse();
@@ -68,11 +76,12 @@ export class TransactionsComponent implements OnInit {
         }),
         { amount: 0 }
       );
-      console.log(this.totalOfAllTransactions);
-
       this.partOfTransactions();
     });
   }
+  /**
+   * This method will add new Transaction to a group
+   */
   addNewTransaction() {
     const transactionMembers = this.transactionForm.value.membersOfTransaction
       .map((checked, i) => (checked ? this.groupMemberForCheckbox[i] : null))
@@ -87,7 +96,6 @@ export class TransactionsComponent implements OnInit {
         paid: false,
       },
     ];
-    console.log(transactionMembersWithinitiator);
 
     let user = JSON.parse(localStorage.getItem('user'));
     const payloadForCreateTransaction = {
@@ -103,19 +111,18 @@ export class TransactionsComponent implements OnInit {
 
     this.api
       .createTransaction(payloadForCreateTransaction)
-      .subscribe((data) => {
-        console.log(data);
-      });
+      .subscribe((data) => {});
     setTimeout(() => {
       this.getAllTransactions();
     }, 1000);
     this.transactionForm.reset();
+    this.showSuccess = true;
   }
-
+  /**
+   * This method will fetch the group details
+   */
   getGroupData() {
     this.api.getGroup(this.groupId).subscribe((data) => {
-      console.log(data);
-
       const groupmemberwithpaidflag = data['data'][0]?.members;
       data['data'][0]?.members.forEach((member) => {
         member.paid = false;
@@ -125,25 +132,26 @@ export class TransactionsComponent implements OnInit {
       this.groupMemberForCheckbox = this.groupMember.filter((ele) => {
         return ele.userEmailId != this.loggedInUser.userEmailId;
       });
-      console.log(this.groupMemberForCheckbox);
       this.addCheckboxes();
     });
   }
-
+  /**
+   * This method will add checkbox in transaction form
+   */
   private addCheckboxes() {
     this.groupMemberForCheckbox?.forEach((member) => {
       this.membersOfTransactionFormArray.push(new FormControl(false));
     });
-    console.log(this.membersOfTransactionFormArray);
   }
-
+  /**
+   * This method fetches the users transactions
+   */
   partOfTransactions() {
     this.userPartOfTransactions = [];
     let user = JSON.parse(localStorage.getItem('user'));
     this.allTransactions?.forEach((ele) => {
       ele['membersOfTransaction'].forEach((ele2) => {
         if (ele2?.['userEmailId'] == user.userEmailId) {
-          console.log('if con');
           if (!this.userPartOfTransactions.includes(ele)) {
             this.userPartOfTransactions.push(ele);
           }
@@ -151,15 +159,21 @@ export class TransactionsComponent implements OnInit {
       });
     });
 
-    console.log(this.userPartOfTransactions);
     this.totalOfPartOfTransactions = this.userPartOfTransactions?.reduce(
       (previousValue, currentValue) => ({
         amount: previousValue.amount + currentValue.amount,
       }),
       { amount: 0 }
     );
-    console.log(this.totalOfAllTransactions);
+    setTimeout(() => {
+      this.showSuccess = false;
+    }, 1000);
   }
+  /**
+   * This method validates the minimum member selection for a expense.
+   * @param min 
+   * @returns 
+   */
   minSelectedCheckboxes(min = 1) {
     const validator: ValidatorFn = (formArray: FormArray) => {
       const totalSelected = formArray.controls
@@ -174,7 +188,52 @@ export class TransactionsComponent implements OnInit {
   get form() {
     return this.transactionForm.controls;
   }
+  /**
+   * This method assigns transaction to modal when user clicks on settle button
+   * @param selectedTransaction
+   */
   assigntransactionToModal(selectedTransaction) {
+    let count = 1;
+    this.transactionSettled = false;
     this.transactionInModal = selectedTransaction;
+    if (
+      this.transactionInModal.initiatedBy.userEmailId ==
+      this.loggedInUser.userEmailId
+    ) {
+      this.transactionInModal.membersOfTransaction.forEach((ele) => {
+        if (ele?.paid) {
+          count++;
+        }
+      });
+      if (count == this.transactionInModal.membersOfTransaction.length) {
+        this.transactionSettled = true;
+      }
+    }
+  }
+  focusOnTransactionName() {
+    this.transactionNameField.nativeElement.focus();
+  }
+  scroll(el: HTMLElement) {
+    console.log(el);
+    el.scrollIntoView({ behavior: 'smooth' });
+  }
+  /**
+   * This method will send email invites
+   * @param user
+   */
+  sendInviteMail(user) {
+    this.inviteSend = false;
+    this.registered = false;
+    const payload = { userEmailId: user.userEmailId };
+    this.api.sendInviteMail(payload).subscribe(
+      (data) => {
+        console.log(data);
+        this.inviteSend = true;
+      },
+      (error) => {
+        console.log(error);
+        this.registered = true;
+      }
+    );
   }
 }

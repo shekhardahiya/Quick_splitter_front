@@ -1,11 +1,11 @@
 <nav class="navbar navbar-expand-lg navbar-dark navColor">
   <div class="container-fluid" style="margin-left: 70px">
     <img
-      src="../assets/logo2.png"
+      src="../assets/logo3.png"
       style="height: 40px; position: absolute; left: 2px; top: 5px"
       alt=""
     />
-    <a class="navbar-brand brand" href="https://gmptoday.com">Bill Spllitor</a>
+    <a class="navbar-brand brand" href="https://gmptoday.com">Quick Splitter</a>
     <button
       class="navbar-toggler"
       type="button"
@@ -34,12 +34,16 @@
       </ul>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item" *ngIf="loggedInUser">
-          <a class="nav-link active text-capitalize"
-            >Hi, {{ loggedInUser?.userName }}
-          </a>
+          <a class="nav-link active text-capitalize">Hi, {{ loggedInUser }} </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link active" [routerLink]="['/logout']"> Logout </a>
+        <li class="nav-item" *ngIf="loggedInUser">
+          <a
+            class="nav-link active"
+            [routerLink]="['/logout']"
+            (click)="logOut()"
+          >
+            Logout
+          </a>
         </li>
       </ul>
     </div>

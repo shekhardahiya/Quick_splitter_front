@@ -1,13 +1,26 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataProviderService {
   constructor(private http: HttpClient) {}
-  // URI = 'https://node-trainiing.herokuapp.com/api/v1/';
-  URI = 'http://localhost:5000/api/v1/';
+  URI = 'https://node-trainiing.herokuapp.com/api/v1/';
+  // URI = 'http://localhost:5000/api/v1/';
+
+  userData = new Subject<any>(); //Decalring new RxJs Subject
+  sendInviteMail(data) {
+    return this.http.post(this.URI + 'bills/sendmail', data);
+  }
+  sendUserData(data: string) {
+    console.log('called');
+    this.userData.next(data);
+  }
+  getuserForNav(): Observable<any> {
+    return this.userData.asObservable();
+  }
   getUser(user) {
     return this.http.post(this.URI + 'bills/LoginUser', user);
   }
@@ -32,7 +45,6 @@ export class DataProviderService {
     return this.http.get(this.URI + 'bills/' + transactionId + '/Transaction');
   }
   createTransaction(transaction) {
-    console.log(transaction);
     return this.http.post(this.URI + 'bills/Transaction', transaction);
   }
   getGroup(groupId) {

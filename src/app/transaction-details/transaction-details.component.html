@@ -2,13 +2,13 @@
   <div class="row">
     <div class="col-md-8">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-8">
           <div class="card">
-            <div class="card-header text-capitalize text-center">
+            <div class="card-header text-capitalize text-center fs-3 fontType">
               {{ transactionDetails?.transactionName }}
             </div>
 
-            <div class="card-body">
+            <div class="card-body fs-5">
               <div
                 *ngFor="let member of transactionDetails?.membersOfTransaction"
               >
@@ -20,28 +20,33 @@
                   "
                 >
                   <div *ngIf="member?.paid">
-                    <span class="text-capitalize"
+                    <span class="text-capitalize fontType"
                       >{{ member.memberName }}
                     </span>
-                    already Paid
+                    paid you
+                    {{
+                      transactionDetails?.amount /
+                        transactionDetails?.membersOfTransaction.length
+                        | currency: "INR":"symbol"
+                    }}
                     <hr />
                   </div>
 
                   <div *ngIf="!member?.paid">
-                    <span class="text-capitalize">
+                    <span class="text-capitalize fontType">
                       {{ member?.memberName }}</span
                     >
-                    :
+                    -
                     {{
                       transactionDetails?.amount /
                         transactionDetails?.membersOfTransaction.length
                         | currency: "INR":"symbol"
                     }}
                     <button
-                      class="btn btn-success"
+                      class="btn btn-success paidButton"
                       (click)="updateTransaction(member?.userEmailId)"
                     >
-                      Mark as paid
+                      Mark as paid <i class="fa-solid fa-check"></i>
                     </button>
                     <hr />
                   </div>
@@ -54,7 +59,7 @@
                     member?.userEmailId == loggedInUser?.userEmailId
                   "
                 >
-                  <div *ngIf="member?.paid">
+                  <div *ngIf="member?.paid; fontType">
                     You have Paid
                     {{
                       transactionDetails?.amount /
@@ -63,7 +68,7 @@
                     }}
                     to {{ transactionDetails?.initiatedBy.memberName }}
                   </div>
-                  <div *ngIf="!member?.paid">
+                  <div *ngIf="!member?.paid; fontType">
                     You have to pay
                     {{
                       transactionDetails?.amount /
@@ -76,18 +81,48 @@
               </div>
             </div>
           </div>
+          <br />
         </div>
       </div>
     </div>
+
     <div class="col-md-4">
-      <input type="text" [(ngModel)]="commentInput" />
-      <button (click)="createComment()">Send</button>
+      <div class="fs-3 fontType">Comment Section</div>
+      <div class="mb-3">
+        <label for="exampleFormControlTextarea1" class="form-label"></label>
+        <textarea
+          placeholder="Type your Comments Here"
+          [(ngModel)]="commentInput"
+          class="form-control"
+          id="exampleFormControlTextarea1"
+          rows="2"
+        ></textarea>
+      </div>
+
+      <button
+        (click)="createComment()"
+        class="btn btn-primary"
+        [disabled]="!commentInput"
+      >
+        Add Comment <i class="fa-solid fa-comment-medical"></i>
+      </button>
+      <hr />
 
       <div *ngFor="let comment of allComments">
-        {{ comment?.comment }} <br />
-        By: {{ comment?.commentedBy.memberName }} Created On :{{
-          comment.createdDate | date: "medium"
-        }}
+        <div class="card">
+          <div class="card-body">
+            <i class="fa-regular fa-user"></i>
+            <span class="vl text-success">
+              {{ comment?.commentedBy.memberName }}</span
+            >
+            <span class="vl">
+              {{ comment.createdDate | date: "dd/MM/yy hh:mm a" }}</span
+            >
+            <hr />
+            {{ comment?.comment }}
+          </div>
+        </div>
+        <br />
       </div>
     </div>
   </div>
