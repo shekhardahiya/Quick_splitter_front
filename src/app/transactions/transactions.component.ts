@@ -57,6 +57,7 @@ export class TransactionsComponent implements OnInit {
       transactionName: ['', [Validators.required]],
       amount: ['', [Validators.required, Validators.min(1)]],
       membersOfTransaction: new FormArray([], this.minSelectedCheckboxes(1)),
+      upiId: [''],
     });
     this.start = true;
   }
@@ -107,6 +108,7 @@ export class TransactionsComponent implements OnInit {
       },
       amount: this.transactionForm.controls.amount.value,
       membersOfTransaction: transactionMembersWithinitiator,
+      upiId: this.transactionForm.controls?.upiId.value,
     };
 
     this.api
@@ -171,8 +173,8 @@ export class TransactionsComponent implements OnInit {
   }
   /**
    * This method validates the minimum member selection for a expense.
-   * @param min 
-   * @returns 
+   * @param min
+   * @returns
    */
   minSelectedCheckboxes(min = 1) {
     const validator: ValidatorFn = (formArray: FormArray) => {
