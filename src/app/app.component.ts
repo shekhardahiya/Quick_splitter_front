@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
     });
   }
   ngOnInit(): void {
-    this.loggedInUser = JSON.parse(localStorage.getItem('user')).userName;
+    this.loggedInUser = JSON.parse(localStorage.getItem('user'))?.userName;
   }
   logOut() {
     this.loggedInUser = '';

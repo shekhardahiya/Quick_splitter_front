@@ -306,10 +306,27 @@
         </table>
       </div>
     </div>
+
     <div class="col-md-5">
+      <br /><br />
+
       <div class="card">
         <div class="card-body">
           <h4 class="allExpensesHeading" #groupMembers>Group Members</h4>
+          <div
+            *ngIf="registered"
+            class="alert alert-danger fs-5 text-center"
+            role="alert"
+          >
+            User already Registered
+          </div>
+          <div
+            *ngIf="inviteSend"
+            class="alert alert-success fs-5 text-center"
+            role="alert"
+          >
+            Invite Sent to the Member
+          </div>
           <table class="table table-bordered table-hover tableTop">
             <tbody>
               <tr *ngFor="let member of groupMember">
@@ -327,20 +344,6 @@
               </tr>
             </tbody>
           </table>
-          <div
-            *ngIf="inviteSend"
-            class="alert alert-success fs-5 text-center"
-            role="alert"
-          >
-            Invite Sent to the Member
-          </div>
-          <div
-            *ngIf="registered"
-            class="alert alert-danger fs-5 text-center"
-            role="alert"
-          >
-            User already Registered
-          </div>
         </div>
       </div>
     </div>
